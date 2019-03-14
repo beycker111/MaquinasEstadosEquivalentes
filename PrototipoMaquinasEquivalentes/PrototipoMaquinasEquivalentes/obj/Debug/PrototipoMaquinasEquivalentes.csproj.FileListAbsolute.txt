@@ -1,0 +1,10 @@
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\bin\Debug\PrototipoMaquinasEquivalentes.exe.config
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\bin\Debug\PrototipoMaquinasEquivalentes.exe
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\bin\Debug\PrototipoMaquinasEquivalentes.pdb
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.csprojAssemblyReference.cache
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.Form1.resources
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.Properties.Resources.resources
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.csproj.GenerateResource.cache
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.csproj.CoreCompileInputs.cache
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.exe
+C:\Users\hp\source\repos\PrototipoMaquinasEquivalentes\PrototipoMaquinasEquivalentes\obj\Debug\PrototipoMaquinasEquivalentes.pdb
