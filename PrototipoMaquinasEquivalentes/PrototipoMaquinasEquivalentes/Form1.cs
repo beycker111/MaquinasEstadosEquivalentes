@@ -457,6 +457,7 @@ namespace PrototipoMaquinasEquivalentes
             }
 
             Console.WriteLine("fin");
+            //Prueba para ver si estoy conectado
         }
     }
 }
