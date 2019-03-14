@@ -12,6 +12,7 @@ namespace PrototipoMaquinasEquivalentes
 {
     public partial class Form1 : Form
     {
+        public static string _ESP = "_";
 
         private List<Estado> listaDeEstados = new List<Estado>();
 
@@ -154,11 +155,20 @@ namespace PrototipoMaquinasEquivalentes
 
             string[] filaN = txtFilasM2.Text.Split(' ');
 
-            Estado nuevoEstado = new Estado(filaN[0]);
+            Estado nuevoEstado = new Estado(filaN[0] + _ESP);
             listaDeEstados.Add(nuevoEstado);
             for (int i = 0; i < cantidadColumnasMaquinas; i++)
             {
-                matrizM2[filasAgregadasHastaAhora, i] = filaN[i];
+                if(i == 0)
+                {
+                    matrizM2[filasAgregadasHastaAhora, i] = filaN[i] + _ESP;
+                }
+                else
+                {
+                    string[] aux = filaN[i].Split(',');
+                    matrizM2[filasAgregadasHastaAhora, i] = aux[0] + _ESP + "," + aux[1];
+                }
+                
             }
             filasAgregadasHastaAhora++;
 
@@ -317,11 +327,11 @@ namespace PrototipoMaquinasEquivalentes
 
             string[] filaN = txtFilasM2.Text.Split(' ');
 
-            Estado nuevoEstado = new Estado(filaN[0]);
+            Estado nuevoEstado = new Estado(filaN[0] + _ESP);
             listaDeEstados.Add(nuevoEstado);
             for (int i = 0; i < cantidadColumnasMaquinas; i++)
             {
-                matrizM2[filasAgregadasHastaAhora, i] = filaN[i];
+                matrizM2[filasAgregadasHastaAhora, i] = filaN[i] + _ESP;
             }
             filasAgregadasHastaAhora++;
 
