@@ -1,92 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace PrototipoMaquinasEquivalentes
 {
-    public partial class Form1 : Form
+    class EquivalencyTester
     {
         public static string _ESP = "_";
 
         private List<State> listaDeEstados = new List<State>();
 
-        private string tipo = ""; 
-        private int cantidadEstadosM1 = 0;
-        private int cantidadEstadosM2 = 0;
-        private int cantidadColumnasMaquinas = 0;
+        public string tipo { get; set; }
+        public int cantidadEstadosM1 = 0;
+        public int cantidadEstadosM2 = 0;
+        public int cantidadColumnasMaquinas = 0;
 
-        private string[,] matrizM1;
-        private string[,] matrizM2;
-        private string[,] matrizSumaDirecta;
+        public string[,] matrizM1 { get; set; }
+        public string[,] matrizM2 { get; set; }
+        public string[,] matrizSumaDirecta { get; set; }
 
-        private int filasAgregadasHastaAhora = 0;
-
-        public Form1()
+        public void agregarEstado(State nuevoEstado)
         {
-            InitializeComponent();
-
-        }
-
-        private void btnUno_Click(object sender, EventArgs e)
-        {
-            if(cbxTipo.Text == "Mealy")
-            {
-                tipo = "Mealy";
-                cantidadEstadosM1 = Convert.ToInt32(txtCantidadEstadosM1.Text);
-                string[] listaEstimulos = txtEstimulos.Text.Split(' ');
-                cantidadColumnasMaquinas = listaEstimulos.Length + 1;
-                matrizM1 = new string[cantidadEstadosM1, cantidadColumnasMaquinas];
-
-            }
-            else
-            {
-                tipo = "Moore";
-                cantidadEstadosM1 = Convert.ToInt32(txtCantidadEstadosM1.Text);
-                string[] listaEstimulos = txtEstimulos.Text.Split(' ');
-                cantidadColumnasMaquinas = listaEstimulos.Length + 2;
-                matrizM1 = new string[cantidadEstadosM1, cantidadColumnasMaquinas];
-            }
-        }
-
-        private void btn2_Click(object sender, EventArgs e)
-        {
-
-            if(tipo == "mealing")
-            {
-                mealingM1();
-            }
-            else
-            {
-                mooreM1();
-            }
-
-        }
-
-        public void mealingM1()
-        {
-            //Aqui empezamos a construir la matriz y el grafo
-            string[] filaN = txtFilasM1.Text.Split(' ');
-
-            State nuevoEstado = new State(filaN[0]);
             listaDeEstados.Add(nuevoEstado);
-            for (int i = 0; i < cantidadColumnasMaquinas; i++)
+        }
+        public void crearRelaciones()
+        {
+            if(tipo.Equals("Mealy"))
             {
-                matrizM1[filasAgregadasHastaAhora, i] = filaN[i];
+                crearRelacionesMealyM1();
+                crearRelacionesMealy2();
             }
-            filasAgregadasHastaAhora++;
-
-            //Empieza a crearse las relaciones
-            if (filasAgregadasHastaAhora == cantidadEstadosM1)
+            else if(tipo.Equals("Moore"))
             {
+                crearRelacionesMooreM1();
+                crearRelacionesMooreM2();
+            }
+        }
+        public void particionar()
+        {
+            if (tipo.Equals("Mealy"))
+            {
+                
+            }
+            else if (tipo.Equals("Moore"))
+            {
+                particionamientoMoore();
+            }
+        }
+        private void crearRelacionesMooreM1()
+        {
+            //Empieza a crearse las relaciones
+           
                 for (int a = 0; a < cantidadEstadosM1; a++)
                 {
-                    for (int b = 1; b < cantidadColumnasMaquinas; b++) //sE QUITO UN MENOS 1
+                    for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
                     {
                         State padre = null;
                         foreach (State elemento in listaDeEstados)
@@ -96,8 +65,7 @@ namespace PrototipoMaquinasEquivalentes
                         State hijo = null;
                         foreach (State elemento in listaDeEstados)
                         {
-                            string[] nodoAdy = matrizM1[a, b].Split(',');
-                            if (nodoAdy[0] == elemento.name) hijo = elemento;
+                            if (matrizM1[a, b] == elemento.name) hijo = elemento;
                         }
                         padre.setEstadoAdyacente(hijo);
                     }
@@ -125,7 +93,6 @@ namespace PrototipoMaquinasEquivalentes
                         matrizM1[i, 0] = "";
                     }
                 }
-
                 //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
                 cantidadEstadosM1 = cantidadEstadosM1 - estadosEliminados;
                 //Creamos la nueva matriz con estados eliminados
@@ -146,35 +113,144 @@ namespace PrototipoMaquinasEquivalentes
 
                 matrizM1 = nuevaMatrizM1;
 
-            }
+            
         }
-
-        public void mealingM2()
+        private void crearRelacionesMooreM2()
         {
-            //Aqui empezamos a construir la matriz y el grafo
-
-            string[] filaN = txtFilasM2.Text.Split(' ');
-
-            State nuevoEstado = new State(filaN[0] + _ESP);
-            listaDeEstados.Add(nuevoEstado);
-            for (int i = 0; i < cantidadColumnasMaquinas; i++)
-            {
-                if(i == 0)
-                {
-                    matrizM2[filasAgregadasHastaAhora, i] = filaN[i] + _ESP;
-                }
-                else
-                {
-                    string[] aux = filaN[i].Split(',');
-                    matrizM2[filasAgregadasHastaAhora, i] = aux[0] + _ESP + "," + aux[1];
-                }
-                
-            }
-            filasAgregadasHastaAhora++;
-
             //Empieza a crearse las relaciones
-            if (filasAgregadasHastaAhora == cantidadEstadosM2)
+            
+                for (int a = 0; a < cantidadEstadosM2; a++)
+                {
+                    for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
+                    {
+                        State padre = null;
+                        foreach (State elemento in listaDeEstados)
+                        {
+                            if (matrizM2[a, 0] == elemento.name) padre = elemento;
+                        }
+                        State hijo = null;
+                        foreach (State elemento in listaDeEstados)
+                        {
+                            if (matrizM2[a, b] == elemento.name) hijo = elemento;
+                        }
+                        padre.setEstadoAdyacente(hijo);
+                    }
+                }
+
+                BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
+                List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
+                //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
+                int estadosEliminados = 0;
+
+                for (int i = 1; i < cantidadEstadosM2; i++)
+                {
+                    Boolean seEncontro = false;
+                    for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
+                    {
+                        if (listaAlcanzables.ElementAt(j).name == matrizM2[i, 0])
+                        {
+                            seEncontro = true;
+                        }
+                    }
+                    if (!seEncontro)
+                    {
+                        //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
+                        estadosEliminados++;
+                        matrizM2[i, 0] = "";
+                    }
+                }
+                //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
+                cantidadEstadosM2 = cantidadEstadosM2 - estadosEliminados;
+                //Creamos la nueva matriz con estados eliminados
+                string[,] nuevaMatrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
+                //Llenamos la nueva matriz
+                for (int i = 0, l = 0; i < cantidadEstadosM2; i++, l++)
+                {
+                    for (int j = 0; j < cantidadColumnasMaquinas; j++)
+                    {
+                        while (matrizM2[l, 0] == "")
+                        {
+                            l++;
+                        }
+                        //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
+                        nuevaMatrizM2[i, j] = matrizM2[l, j];
+                    }
+                }
+
+                matrizM2 = nuevaMatrizM2;
+
+                //Ahora haremos la sumaDirecta;
+                sumaDirecta();
+        }
+        private void crearRelacionesMealyM1()
+        {
+           
+                for (int a = 0; a < cantidadEstadosM1; a++)
+                {
+                    for (int b = 1; b < cantidadColumnasMaquinas; b++) //sE QUITO UN MENOS 1
+                    {
+                        State padre = null;
+                        foreach (State elemento in listaDeEstados)
+                        {
+                            if (matrizM1[a, 0] == elemento.name) padre = elemento;
+                        }
+                        State hijo = null;
+                        foreach (State elemento in listaDeEstados)
+                        {
+                            string[] nodoAdy = matrizM1[a, b].Split(',');
+                            if (nodoAdy[0] == elemento.name) hijo = elemento;
+                        }
+                        padre.setEstadoAdyacente(hijo);
+                    }
+                }
+
+            BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
+            List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
+            //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
+            int estadosEliminados = 0;
+
+            for (int i = 1; i < cantidadEstadosM1; i++)
             {
+                Boolean seEncontro = false;
+                for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
+                {
+                    if (listaAlcanzables.ElementAt(j).name == matrizM1[i, 0])
+                    {
+                        seEncontro = true;
+                    }
+                }
+                if (!seEncontro)
+                {
+                    //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
+                    estadosEliminados++;
+                    matrizM1[i, 0] = "";
+                }
+            }
+
+            //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
+            cantidadEstadosM1 = cantidadEstadosM1 - estadosEliminados;
+            //Creamos la nueva matriz con estados eliminados
+            string[,] nuevaMatrizM1 = new string[cantidadEstadosM1, cantidadColumnasMaquinas];
+            //Llenamos la nueva matriz
+            for (int i = 0, l = 0; i < cantidadEstadosM1; i++, l++)
+            {
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
+                {
+                    while (matrizM1[l, 0] == "")
+                    {
+                        l++;
+                    }
+                    //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
+                    nuevaMatrizM1[i, j] = matrizM1[l, j];
+                }
+            }
+
+            matrizM1 = nuevaMatrizM1;
+        }
+        private void crearRelacionesMealy2()
+        {
+            //Empieza a crearse las relaciones
+            
                 for (int a = 0; a < cantidadEstadosM2; a++)
                 {
                     for (int b = 1; b < cantidadColumnasMaquinas; b++)
@@ -238,230 +314,13 @@ namespace PrototipoMaquinasEquivalentes
 
                 //Ahora haremos la sumaDirecta;
                 sumaDirecta();
-
-            }
         }
-
-        public void mooreM1()
-        {
-            //Aqui empezamos a construir la matriz y el grafo
-            string[] filaN = txtFilasM1.Text.Split(' ');
-
-            State nuevoEstado = new State(filaN[0]);
-            listaDeEstados.Add(nuevoEstado);
-            for (int i = 0; i < cantidadColumnasMaquinas; i++)
-            {
-                matrizM1[filasAgregadasHastaAhora, i] = filaN[i];
-            }
-            filasAgregadasHastaAhora++;
-
-            //Empieza a crearse las relaciones
-            if (filasAgregadasHastaAhora == cantidadEstadosM1)
-            {
-                for (int a = 0; a < cantidadEstadosM1; a++)
-                {
-                    for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
-                    {
-                        State padre = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM1[a, 0] == elemento.name) padre = elemento;
-                        }
-                        State hijo = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM1[a, b] == elemento.name) hijo = elemento;
-                        }
-                        padre.setEstadoAdyacente(hijo);
-                    }
-                }
-
-                BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
-                List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
-                //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
-                int estadosEliminados = 0;
-
-                for (int i = 1; i < cantidadEstadosM1; i++)
-                {
-                    Boolean seEncontro = false;
-                    for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
-                    {
-                        if (listaAlcanzables.ElementAt(j).name == matrizM1[i, 0])
-                        {
-                            seEncontro = true;
-                        }
-                    }
-                    if (!seEncontro)
-                    {
-                        //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
-                        estadosEliminados++;
-                        matrizM1[i, 0] = "";
-                    }
-                }
-                //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
-                cantidadEstadosM1 = cantidadEstadosM1 - estadosEliminados;
-                //Creamos la nueva matriz con estados eliminados
-                string[,] nuevaMatrizM1 = new string[cantidadEstadosM1, cantidadColumnasMaquinas];
-                //Llenamos la nueva matriz
-                for (int i = 0, l = 0; i < cantidadEstadosM1; i++, l++)
-                {
-                    for (int j = 0; j < cantidadColumnasMaquinas; j++)
-                    {
-                        while (matrizM1[l, 0] == "")
-                        {
-                            l++;
-                        }
-                        //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
-                        nuevaMatrizM1[i, j] = matrizM1[l, j];
-                    }
-                }
-
-                matrizM1 = nuevaMatrizM1;
-
-            }
-        }
-
-        public void mooreM2()
-        {
-            //Aqui empezamos a construir la matriz y el grafo
-
-            string[] filaN = txtFilasM2.Text.Split(' ');
-
-            State nuevoEstado = new State(filaN[0] + _ESP);
-            listaDeEstados.Add(nuevoEstado);
-            for (int i = 0; i < cantidadColumnasMaquinas; i++)
-            {
-                if(i == cantidadColumnasMaquinas - 1)
-                {
-                    matrizM2[filasAgregadasHastaAhora, i] = filaN[i];
-                }
-                else
-                {
-                    matrizM2[filasAgregadasHastaAhora, i] = filaN[i] + _ESP;
-                }
-                
-            }
-            filasAgregadasHastaAhora++;
-
-            //Empieza a crearse las relaciones
-            if (filasAgregadasHastaAhora == cantidadEstadosM2)
-            {
-                for (int a = 0; a < cantidadEstadosM2; a++)
-                {
-                    for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
-                    {
-                        State padre = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM2[a, 0] == elemento.name) padre = elemento;
-                        }
-                        State hijo = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM2[a, b] == elemento.name) hijo = elemento;
-                        }
-                        padre.setEstadoAdyacente(hijo);
-                    }
-                }
-
-                BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
-                List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
-                //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
-                int estadosEliminados = 0;
-
-                for (int i = 1; i < cantidadEstadosM2; i++)
-                {
-                    Boolean seEncontro = false;
-                    for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
-                    {
-                        if (listaAlcanzables.ElementAt(j).name == matrizM2[i, 0])
-                        {
-                            seEncontro = true;
-                        }
-                    }
-                    if (!seEncontro)
-                    {
-                        //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
-                        estadosEliminados++;
-                        matrizM2[i, 0] = "";
-                    }
-                }
-                //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
-                cantidadEstadosM2 = cantidadEstadosM2 - estadosEliminados;
-                //Creamos la nueva matriz con estados eliminados
-                string[,] nuevaMatrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
-                //Llenamos la nueva matriz
-                for (int i = 0, l = 0; i < cantidadEstadosM2; i++, l++)
-                {
-                    for (int j = 0; j < cantidadColumnasMaquinas; j++)
-                    {
-                        while (matrizM2[l, 0] == "")
-                        {
-                            l++;
-                        }
-                        //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
-                        nuevaMatrizM2[i, j] = matrizM2[l, j];
-                    }
-                }
-
-                matrizM2 = nuevaMatrizM2;
-
-                //Ahora haremos la sumaDirecta;
-                sumaDirecta();
-
-            }
-        }
-
-        private void btnPrueba_Click(object sender, EventArgs e)
-        {
-            State D = new State("D");
-            State E = new State("E");
-            State F = new State("F");
-            State G = new State("G");
-            State H = new State("H");
-            State I = new State("I");
-            D.setEstadoAdyacente(E);
-            D.setEstadoAdyacente(D);
-            E.setEstadoAdyacente(D);
-            E.setEstadoAdyacente(F);
-            F.setEstadoAdyacente(F);
-            F.setEstadoAdyacente(I);
-            G.setEstadoAdyacente(E);
-            G.setEstadoAdyacente(H);
-            H.setEstadoAdyacente(D);
-            H.setEstadoAdyacente(G);
-            I.setEstadoAdyacente(E);
-            I.setEstadoAdyacente(H);
-        }
-
-        private void btnTres_Click(object sender, EventArgs e)
-        {
-            cantidadEstadosM2 = Convert.ToInt32(txtCantidadEstadosM2.Text);
-            matrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
-
-            //Reiniciamos los atributos que se reciclaran de M1
-            listaDeEstados = new List<State>();
-            filasAgregadasHastaAhora = 0;
-        }
-
-        private void btnCuatro_Click(object sender, EventArgs e)
-        {
-            if (tipo == "mealing")
-            {
-                mealingM2();
-            }
-            else
-            {
-                mooreM2();
-            }
-        }
-
-        public void sumaDirecta()
+        private void sumaDirecta()
         {
             matrizSumaDirecta = new string[cantidadEstadosM1 + cantidadEstadosM2, cantidadColumnasMaquinas];
-            for(int i = 0; i < cantidadEstadosM1; i++)
+            for (int i = 0; i < cantidadEstadosM1; i++)
             {
-                for(int j = 0; j < cantidadColumnasMaquinas; j++)
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
                 {
                     matrizSumaDirecta[i, j] = matrizM1[i, j];
                 }
@@ -478,7 +337,6 @@ namespace PrototipoMaquinasEquivalentes
             //Prueba para ver si estoy conectado
             particionamientoMoore();
         }
-
         public void particionamientoMoore()
         {
 
@@ -488,7 +346,7 @@ namespace PrototipoMaquinasEquivalentes
             List<List<string>> lista = new List<List<string>>(); // Aquí serán guardadas las particiones
             for (int i = 0; i < (cantidadEstadosM1 + cantidadEstadosM2); i++)
             {
-                if(matrizAux[i,cantidadColumnasMaquinas - 1] != "")
+                if (matrizAux[i, cantidadColumnasMaquinas - 1] != "")
                 {
                     string salida = matrizAux[i, cantidadColumnasMaquinas - 1];
                     matrizAux[i, cantidadColumnasMaquinas - 1] = "";
@@ -499,7 +357,7 @@ namespace PrototipoMaquinasEquivalentes
                     {
                         if (matrizAux[j, cantidadColumnasMaquinas - 1] != "")
                         {
-                            if(salida == matrizAux[j, cantidadColumnasMaquinas - 1])
+                            if (salida == matrizAux[j, cantidadColumnasMaquinas - 1])
                             {
                                 matrizAux[j, cantidadColumnasMaquinas - 1] = "";
                                 listaN.Add(matrizAux[j, 0]);
@@ -530,68 +388,69 @@ namespace PrototipoMaquinasEquivalentes
                 {
                     List<string> listaM = lista.ElementAt(i);
 
-                        int posicionCero = 0;
-                        string estadoA = listaM.ElementAt(posicionCero); //Este sera A
-                        List<string> listaNuevaM = new List<string>(); //Esta será la lista donde vayan los valores que ya no esten en la particon
-                        //Este parece ser un buen lugar para agregar la lista de string
-                        for(int k = posicionCero+1; k < listaM.Count; k++)
+                    int posicionCero = 0;
+                    string estadoA = listaM.ElementAt(posicionCero); //Este sera A
+                    List<string> listaNuevaM = new List<string>(); //Esta será la lista donde vayan los valores que ya no esten en la particon
+                                                                   //Este parece ser un buen lugar para agregar la lista de string
+                    for (int k = posicionCero + 1; k < listaM.Count; k++)
+                    {
+                        string estadoB = listaM.ElementAt(k);
+                        //Ya que tenemos los dos estados a comparar, los buscamos en la matriz
+                        int filaA = -1;
+                        int filaB = -1;
+                        //Vamos a buscar la fila de A
+                        for (int l = 0; l < (cantidadEstadosM1 + cantidadEstadosM2); l++)
                         {
-                            string estadoB = listaM.ElementAt(k);
-                            //Ya que tenemos los dos estados a comparar, los buscamos en la matriz
-                            int filaA = -1;
-                            int filaB = -1;
-                            //Vamos a buscar la fila de A
-                            for(int l = 0; l < (cantidadEstadosM1 + cantidadEstadosM2); l++)
+                            if (estadoA == matrizSumaDirecta[l, 0])
                             {
-                                if(estadoA == matrizSumaDirecta[l, 0])
-                                {
-                                    filaA = l;
-                                }else if (estadoB == matrizSumaDirecta[l, 0])
-                                {
-                                    filaB = l;
-                                }
-                                //Cuando ya encontramos las posiciones en las filas de los estados entonces cortamos.
-                                if(filaA != -1 && filaB != -1)
-                                {
-                                    break;
-                                }
+                                filaA = l;
                             }
-
-                            //Ahora tenemos que ver si todos los estimulos de esas dos filas corresponden a un grupo de la lista
-                            //Boolean coso = lista.ElementAt(0).Contains("T");
-                            Boolean seParticiono = false;
-                            for(int h = 1; h < (cantidadColumnasMaquinas - 1) && !seParticiono; h++)
+                            else if (estadoB == matrizSumaDirecta[l, 0])
                             {
-                                //Obtenemos aqui cada uno de los estados a comparar de acuerdo al estimulo en que esten
-                                string estadoEstimuloA = matrizSumaDirecta[filaA, h];
-                                string estadoEstimuloB = matrizSumaDirecta[filaB, h];
-                                //Ahora miramos si estan en la misma particion
+                                filaB = l;
+                            }
+                            //Cuando ya encontramos las posiciones en las filas de los estados entonces cortamos.
+                            if (filaA != -1 && filaB != -1)
+                            {
+                                break;
+                            }
+                        }
 
-                                for (int c = 0; c < lista.Count; c++)
+                        //Ahora tenemos que ver si todos los estimulos de esas dos filas corresponden a un grupo de la lista
+                        //Boolean coso = lista.ElementAt(0).Contains("T");
+                        Boolean seParticiono = false;
+                        for (int h = 1; h < (cantidadColumnasMaquinas - 1) && !seParticiono; h++)
+                        {
+                            //Obtenemos aqui cada uno de los estados a comparar de acuerdo al estimulo en que esten
+                            string estadoEstimuloA = matrizSumaDirecta[filaA, h];
+                            string estadoEstimuloB = matrizSumaDirecta[filaB, h];
+                            //Ahora miramos si estan en la misma particion
+
+                            for (int c = 0; c < lista.Count; c++)
+                            {
+                                if (lista.ElementAt(c).Contains(estadoEstimuloA))
                                 {
-                                    if (lista.ElementAt(c).Contains(estadoEstimuloA))
+                                    if (lista.ElementAt(c).Contains(estadoEstimuloB))
                                     {
-                                        if (lista.ElementAt(c).Contains(estadoEstimuloB))
-                                        {
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            //Aquí es donde va si no pertenecen a la misma particion
-                                            //Deberia romper dos for hacia arriba
-                                            seParticiono = true;
-                                            listaNuevaM.Add(estadoB);
-                                            break;
-                                        }
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        //Aquí es donde va si no pertenecen a la misma particion
+                                        //Deberia romper dos for hacia arriba
+                                        seParticiono = true;
+                                        listaNuevaM.Add(estadoB);
+                                        break;
                                     }
                                 }
                             }
-
-                       
                         }
 
+
+                    }
+
                     //Agregamos listaNueva a auxP1
-                    if(listaNuevaM.Count != 0)
+                    if (listaNuevaM.Count != 0)
                     {
                         auxP1.Add(listaNuevaM);
                         //Aqui es donde se deberian eliminar
@@ -606,7 +465,7 @@ namespace PrototipoMaquinasEquivalentes
                     }
 
                     Console.WriteLine("Casi listo");
-                    
+
                 }
 
                 //Aqui miramos si no se han hecho nuevas particiones, si se han hecho, debe continuar, sino se acaba el programa
@@ -622,15 +481,14 @@ namespace PrototipoMaquinasEquivalentes
 
             comprobarMaquinaDeMoore(lista);
 
-            
-        }
 
+        }
         public void comprobarMaquinaDeMoore(List<List<string>> listaFinal)
         {
             Boolean resultado = true;
-            for(int i = 0; i < listaFinal.Count; i++)
+            for (int i = 0; i < listaFinal.Count; i++)
             {
-                if(listaFinal.ElementAt(i).Count < 2)
+                if (listaFinal.ElementAt(i).Count < 2)
                 {
                     resultado = false;
                     break;
@@ -640,10 +498,10 @@ namespace PrototipoMaquinasEquivalentes
 
             if (resultado)
             {
-                for(int i = 0; i < listaFinal.Count && resultado; i++)
+                for (int i = 0; i < listaFinal.Count && resultado; i++)
                 {
                     Boolean encontroM1 = false;
-                    for(int j = 0; j < cantidadEstadosM1 && resultado; j++)
+                    for (int j = 0; j < cantidadEstadosM1 && resultado; j++)
                     {
                         if (listaFinal.ElementAt(i).Contains(matrizM1[j, 0]))
                         {
@@ -678,10 +536,6 @@ namespace PrototipoMaquinasEquivalentes
 
             Console.WriteLine(resultado);
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
     }
+
 }

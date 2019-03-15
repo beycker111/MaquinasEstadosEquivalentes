@@ -8,24 +8,24 @@ namespace PrototipoMaquinasEquivalentes
 {
     public class BreadthFirstAlgorithm
     {
-        public Estado construirGrafo()
+        public State construirGrafo()
         {
 
             //
 
-            Estado Aaron = new Estado("Aaron");
-            Estado Betty = new Estado("Betty");
-            Estado Brian = new Estado("Brian");
+            State Aaron = new State("Aaron");
+            State Betty = new State("Betty");
+            State Brian = new State("Brian");
             Aaron.setEstadoAdyacente(Betty);
             Aaron.setEstadoAdyacente(Brian);
 
-            Estado Catherine = new Estado("Catherine");
-            Estado Carson = new Estado("Carson");
-            Estado Darian = new Estado("Darian");
-            Estado Derek = new Estado("Derek");
-            Estado Luis = new Estado("Luis");
-            Estado Beycker = new Estado("Beycker");
-            Estado Angie = new Estado("Angie");
+            State Catherine = new State("Catherine");
+            State Carson = new State("Carson");
+            State Darian = new State("Darian");
+            State Derek = new State("Derek");
+            State Luis = new State("Luis");
+            State Beycker = new State("Beycker");
+            State Angie = new State("Angie");
 
             Betty.setEstadoAdyacente(Catherine);
             Betty.setEstadoAdyacente(Darian);
@@ -40,19 +40,19 @@ namespace PrototipoMaquinasEquivalentes
         }
 
         //http://en.wikipedia.org/wiki/Breadth-first_search#Pseudocode
-        public Estado Search(Estado origen, string destino)
+        public State Search(State origen, string destino)
         {
-            Queue<Estado> Q = new Queue<Estado>();
-            HashSet<Estado> S = new HashSet<Estado>();
+            Queue<State> Q = new Queue<State>();
+            HashSet<State> S = new HashSet<State>();
             Q.Enqueue(origen);
             S.Add(origen);
 
             while (Q.Count > 0)
             {
-                Estado p = Q.Dequeue();
+                State p = Q.Dequeue();
                 if (p.name == destino)
                     return p;
-                foreach (Estado friend in p.getEstadosAdyacentes)
+                foreach (State friend in p.getAdyacentStates)
                 {
                     if (!S.Contains(friend))
                     {
@@ -64,22 +64,22 @@ namespace PrototipoMaquinasEquivalentes
             return null;
         }
 
-        public List<Estado> Traverse(Estado root)
+        public List<State> Traverse(State root)
         {
-            List<Estado> final = new List<Estado>();
-            Queue<Estado> traverseOrder = new Queue<Estado>();
+            List<State> final = new List<State>();
+            Queue<State> traverseOrder = new Queue<State>();
 
-            Queue<Estado> Q = new Queue<Estado>();
-            HashSet<Estado> S = new HashSet<Estado>();
+            Queue<State> Q = new Queue<State>();
+            HashSet<State> S = new HashSet<State>();
             Q.Enqueue(root);
             S.Add(root);
 
             while (Q.Count > 0)
             {
-                Estado p = Q.Dequeue();
+                State p = Q.Dequeue();
                 traverseOrder.Enqueue(p);
 
-                foreach (Estado friend in p.getEstadosAdyacentes)
+                foreach (State friend in p.getAdyacentStates)
                 {
                     if (!S.Contains(friend))
                     {
@@ -91,7 +91,7 @@ namespace PrototipoMaquinasEquivalentes
 
             while (traverseOrder.Count > 0)
             {
-                Estado p = traverseOrder.Dequeue();
+                State p = traverseOrder.Dequeue();
                 final.Add(p);
                 //Console.WriteLine(p);
             }
