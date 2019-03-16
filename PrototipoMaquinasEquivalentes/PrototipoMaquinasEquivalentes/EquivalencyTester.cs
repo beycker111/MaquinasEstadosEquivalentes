@@ -42,7 +42,7 @@ namespace PrototipoMaquinasEquivalentes
         {
             if (tipo.Equals("Mealy"))
             {
-                
+                particionamientoMealy();
             }
             else if (tipo.Equals("Moore"))
             {
