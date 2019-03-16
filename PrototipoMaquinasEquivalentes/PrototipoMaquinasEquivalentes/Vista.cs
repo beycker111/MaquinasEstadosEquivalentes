@@ -213,7 +213,7 @@ namespace PrototipoMaquinasEquivalentes
             generateMachines();
             model.crearRelaciones();
             model.particionar();
-            int i = 0;
+
         }
 
         private void generateMachines()
@@ -236,10 +236,10 @@ namespace PrototipoMaquinasEquivalentes
             model.matrizM1 = M1;
 
             String[,] M2 = new string[dataGridView2.RowCount, dataGridView2.ColumnCount];
-            DataGridViewRowCollection rows2 = dataGridView1.Rows;
+            DataGridViewRowCollection rows2 = dataGridView2.Rows;
             for (int i = 0; i < rows2.Count; i++)
             {
-                model.agregarEstado(new State(rows1[i].Cells[0].Value + ""));
+                model.agregarEstado(new State(rows2[i].Cells[0].Value + ""));
                 for (int j = 0; j < rows2[i].Cells.Count; j++)
                 {
                     M2[i, j] = rows2[i].Cells[j].Value + "";

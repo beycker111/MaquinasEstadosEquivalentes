@@ -318,7 +318,7 @@ namespace PrototipoMaquinasEquivalentes
             for (int i = 0; i < cantidadEstadosM1; i++)
             {
                 List<string> fila = new List<string>();
-                for (int j = 1; j < cantidadColumnasMaquinas; j++)
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
                 {
                     fila.Add(matrizM1[i, j]);
                 }
@@ -327,7 +327,7 @@ namespace PrototipoMaquinasEquivalentes
             for (int i = 0; i < cantidadEstadosM2; i++)
             {
                 List<string> fila = new List<string>();
-                for (int j = 1; j < cantidadColumnasMaquinas; j++)
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
                 {
                     fila.Add(matrizM2[i, j]);
                 }
@@ -381,7 +381,10 @@ namespace PrototipoMaquinasEquivalentes
                         sumaDirecta.Remove(sumaDirecta[j]);
                     }
                 }
+                particiones.Add(particion);
+
             }
+            int f = 0;
         }
         public void particionamientoMoore()
         {
