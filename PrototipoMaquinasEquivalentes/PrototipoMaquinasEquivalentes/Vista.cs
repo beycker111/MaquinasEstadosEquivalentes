@@ -220,12 +220,12 @@ namespace PrototipoMaquinasEquivalentes
         {
             model.tipo = cbxTipoMaquinas.Text;
             model.cantidadColumnasMaquinas = dataGridView1.ColumnCount;
-            model.cantidadEstadosM1 = dataGridView1.RowCount;
-            model.cantidadEstadosM2 = dataGridView2.RowCount;
+            model.cantidadEstadosM1 = dataGridView1.RowCount-1;
+            model.cantidadEstadosM2 = dataGridView2.RowCount-1;
 
-            String[,] M1 = new string[dataGridView1.RowCount, dataGridView1.ColumnCount];
+            String[,] M1 = new string[dataGridView1.RowCount-1, dataGridView1.ColumnCount];
             DataGridViewRowCollection rows1 = dataGridView1.Rows;
-            for (int i = 0; i < rows1.Count; i++)
+            for (int i = 0; i < rows1.Count-1; i++)
             {
                 model.agregarEstado(new State(rows1[i].Cells[0].Value + ""));
                 for (int j = 0; j < rows1[i].Cells.Count; j++)
@@ -235,9 +235,9 @@ namespace PrototipoMaquinasEquivalentes
             }
             model.matrizM1 = M1;
 
-            String[,] M2 = new string[dataGridView2.RowCount, dataGridView2.ColumnCount];
+            String[,] M2 = new string[dataGridView2.RowCount-1, dataGridView2.ColumnCount];
             DataGridViewRowCollection rows2 = dataGridView2.Rows;
-            for (int i = 0; i < rows2.Count; i++)
+            for (int i = 0; i < rows2.Count-1; i++)
             {
                 model.agregarEstado(new State(rows2[i].Cells[0].Value + ""));
                 for (int j = 0; j < rows2[i].Cells.Count; j++)
