@@ -8,8 +8,6 @@ namespace PrototipoMaquinasEquivalentes
 {
     class EquivalencyTester
     {
-        public static string _ESP = "_";
-
         private List<State> listaDeEstados = new List<State>();
 
         public string tipo { get; set; }

@@ -13,6 +13,7 @@ namespace PrototipoMaquinasEquivalentes
     public partial class Vista : Form
     {
         private EquivalencyTester model;
+        public static string _ESP = "_";
 
         public Vista()
         {
@@ -239,10 +240,17 @@ namespace PrototipoMaquinasEquivalentes
             DataGridViewRowCollection rows2 = dataGridView2.Rows;
             for (int i = 0; i < rows2.Count-1; i++)
             {
-                model.agregarEstado(new State(rows2[i].Cells[0].Value + ""));
+                model.agregarEstado(new State(rows2[i].Cells[0].Value + _ESP));
                 for (int j = 0; j < rows2[i].Cells.Count; j++)
                 {
-                    M2[i, j] = rows2[i].Cells[j].Value + "";
+                    if(j == 0)
+                    {
+                        M2[i, j] = rows2[i].Cells[j].Value + _ESP;
+                    }
+                    else
+                    {
+                        M2[i, j] = rows2[i].Cells[j].Value + "";
+                    }
                 }
             }
             model.matrizM2 = M2;
