@@ -246,28 +246,45 @@ namespace PrototipoMaquinasEquivalentes
 
             String[,] M2 = new string[dataGridView2.RowCount-1, dataGridView2.ColumnCount];
             DataGridViewRowCollection rows2 = dataGridView2.Rows;
-            for (int i = 0; i < rows2.Count-1; i++)
-            {
-                model.agregarEstado(new State(rows2[i].Cells[0].Value + _ESP));
-                for (int j = 0; j < rows2[i].Cells.Count; j++)
-                {
-                    if(j == 0)
-                    {
-                        M2[i, j] = rows2[i].Cells[j].Value + _ESP;
-                    }
-                    else
-                    {
-                        M2[i, j] = rows2[i].Cells[j].Value + "";
-                    }
-                }
-            }
-            model.matrizM2 = M2;
             if (model.tipo.Equals("Moore"))
             {
+                for (int i = 0; i < rows2.Count - 1; i++)
+                {
+                    model.agregarEstado(new State(rows2[i].Cells[0].Value + _ESP));
+                    for (int j = 0; j < rows2[i].Cells.Count; j++)
+                    {
+                        if (j != rows2[i].Cells.Count-1)
+                        {
+                            M2[i, j] = rows2[i].Cells[j].Value + _ESP;
+                        }
+                        else
+                        {
+                            M2[i, j] = rows2[i].Cells[j].Value + "";
+                        }
+                    }
+                }
+                model.matrizM2 = M2;
                 model.crearRelacionesMooreM2();
             }
             else if (model.tipo.Equals("Mealy"))
             {
+                for (int i = 0; i < rows2.Count - 1; i++)
+                {
+                    model.agregarEstado(new State(rows2[i].Cells[0].Value + _ESP));
+                    for (int j = 0; j < rows2[i].Cells.Count; j++)
+                    {
+                        if (j == 0)
+                        {
+                            M2[i, j] = rows2[i].Cells[j].Value + _ESP;
+                        }
+                        else
+                        {
+                            string[] aux = (rows2[i].Cells[j].Value + "").Split(',');
+                            M2[i, j] = aux[0] + _ESP + "," + aux[1];
+                        }
+                    }
+                }
+                model.matrizM2 = M2;
                 model.crearRelacionesMealyM2();
             }
 
