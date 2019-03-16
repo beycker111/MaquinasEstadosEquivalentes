@@ -23,19 +23,11 @@ namespace PrototipoMaquinasEquivalentes
         {
             listaDeEstados.Add(nuevoEstado);
         }
-        public void crearRelaciones()
+        public void reiniciarListaEstados()
         {
-            if(tipo.Equals("Mealy"))
-            {
-                crearRelacionesMealyM1();
-                crearRelacionesMealyM2();
-            }
-            else if(tipo.Equals("Moore"))
-            {
-                crearRelacionesMooreM1();
-                crearRelacionesMooreM2();
-            }
+            listaDeEstados = new List<State>();
         }
+        
         public void particionar()
         {
             if (tipo.Equals("Mealy"))
@@ -47,7 +39,7 @@ namespace PrototipoMaquinasEquivalentes
                 particionamientoMoore();
             }
         }
-        private void crearRelacionesMooreM1()
+        public void crearRelacionesMooreM1()
         {
             //Empieza a crearse las relaciones
            
@@ -113,7 +105,7 @@ namespace PrototipoMaquinasEquivalentes
 
             
         }
-        private void crearRelacionesMooreM2()
+        public void crearRelacionesMooreM2()
         {
             //Empieza a crearse las relaciones
             
@@ -180,7 +172,7 @@ namespace PrototipoMaquinasEquivalentes
                 //Ahora haremos la sumaDirecta;
                 sumaDirectaMoore();
         }
-        private void crearRelacionesMealyM1()
+        public void crearRelacionesMealyM1()
         {
            
                 for (int a = 0; a < cantidadEstadosM1; a++)
@@ -245,7 +237,7 @@ namespace PrototipoMaquinasEquivalentes
 
             matrizM1 = nuevaMatrizM1;
         }
-        private void crearRelacionesMealyM2()
+        public void crearRelacionesMealyM2()
         {
             //Empieza a crearse las relaciones
             

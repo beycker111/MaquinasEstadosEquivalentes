@@ -212,7 +212,6 @@ namespace PrototipoMaquinasEquivalentes
         {
             model = new EquivalencyTester();
             generateMachines();
-            model.crearRelaciones();
             model.particionar();
 
         }
@@ -235,6 +234,15 @@ namespace PrototipoMaquinasEquivalentes
                 }
             }
             model.matrizM1 = M1;
+            if(model.tipo.Equals("Moore"))
+            {
+                model.crearRelacionesMooreM1();
+            }
+            else if(model.tipo.Equals("Mealy"))
+            {
+                model.crearRelacionesMealyM1();
+            }
+            model.reiniciarListaEstados();
 
             String[,] M2 = new string[dataGridView2.RowCount-1, dataGridView2.ColumnCount];
             DataGridViewRowCollection rows2 = dataGridView2.Rows;
@@ -254,7 +262,15 @@ namespace PrototipoMaquinasEquivalentes
                 }
             }
             model.matrizM2 = M2;
-            
+            if (model.tipo.Equals("Moore"))
+            {
+                model.crearRelacionesMooreM2();
+            }
+            else if (model.tipo.Equals("Mealy"))
+            {
+                model.crearRelacionesMealyM2();
+            }
+
         }
     }
     
