@@ -30,7 +30,7 @@ namespace PrototipoMaquinasEquivalentes
             if(tipo.Equals("Mealy"))
             {
                 crearRelacionesMealyM1();
-                crearRelacionesMealy2();
+                crearRelacionesMealyM2();
             }
             else if(tipo.Equals("Moore"))
             {
@@ -180,7 +180,7 @@ namespace PrototipoMaquinasEquivalentes
                 matrizM2 = nuevaMatrizM2;
 
                 //Ahora haremos la sumaDirecta;
-                sumaDirecta();
+                sumaDirectaMoore();
         }
         private void crearRelacionesMealyM1()
         {
@@ -247,7 +247,7 @@ namespace PrototipoMaquinasEquivalentes
 
             matrizM1 = nuevaMatrizM1;
         }
-        private void crearRelacionesMealy2()
+        private void crearRelacionesMealyM2()
         {
             //Empieza a crearse las relaciones
             
@@ -311,11 +311,31 @@ namespace PrototipoMaquinasEquivalentes
                 }
 
                 matrizM2 = nuevaMatrizM2;
-
-                //Ahora haremos la sumaDirecta;
-                sumaDirecta();
         }
-        private void sumaDirecta()
+        private List<List<string>> sumaDirectaMealy()
+        {
+            List<List<string>> sumaDirecta = new List<List<string>>();
+            for (int i = 0; i < cantidadEstadosM1; i++)
+            {
+                List<string> fila = new List<string>();
+                for (int j = 1; j < cantidadColumnasMaquinas; j++)
+                {
+                    fila.Add(matrizM1[i, j]);
+                }
+                sumaDirecta.Add(fila);
+            }
+            for (int i = 0; i < cantidadEstadosM2; i++)
+            {
+                List<string> fila = new List<string>();
+                for (int j = 1; j < cantidadColumnasMaquinas; j++)
+                {
+                    fila.Add(matrizM2[i, j]);
+                }
+                sumaDirecta.Add(fila);
+            }
+            return sumaDirecta;
+        }
+        private void sumaDirectaMoore()
         {
             matrizSumaDirecta = new string[cantidadEstadosM1 + cantidadEstadosM2, cantidadColumnasMaquinas];
             for (int i = 0; i < cantidadEstadosM1; i++)
@@ -332,10 +352,36 @@ namespace PrototipoMaquinasEquivalentes
                     matrizSumaDirecta[i, j] = matrizM2[a, j];
                 }
             }
-
-            //Console.WriteLine("fin");
-            //Prueba para ver si estoy conectado
-            particionamientoMoore();
+        }
+        public void particionamientoMealy()
+        {
+            List<List<string>> sumaDirecta = sumaDirectaMealy();
+            List<List<string>> particiones = new List<List<string>>(); // Aquí serán guardadas las particiones
+            for (int i = 0; i < sumaDirecta.Count; i++)
+            {
+                List<string> particion = new List<string>();
+                List<string> filaTemp = sumaDirecta[i];
+                particion.Add(filaTemp[0]);
+                sumaDirecta.Remove(filaTemp);
+                for (int j = 0; j < sumaDirecta.Count; j++)
+                {
+                    int outputsIguales = 0;
+                    for (int k = 1; k < cantidadColumnasMaquinas; k++)
+                    {
+                        string[] transicionTemp = filaTemp[k].Split(',');
+                        string[] transicionActual = sumaDirecta[j][k].Split(',');
+                        if(transicionTemp[1].Equals(transicionActual[1]))
+                        {
+                            outputsIguales++;
+                        }
+                    }
+                    if(outputsIguales == cantidadColumnasMaquinas-1)
+                    {
+                        particion.Add(sumaDirecta[j][0]);
+                        sumaDirecta.Remove(sumaDirecta[j]);
+                    }
+                }
+            }
         }
         public void particionamientoMoore()
         {
