@@ -8,191 +8,240 @@ namespace PrototipoMaquinasEquivalentes
 {
     class EquivalencyTester
     {
+        /// <summary>
+        /// Representa los estados de una máquina, dependiendo del proceso puede ser reutilizada para crear las relaciones de
+        /// diferentes máquinas.
+        /// </summary>
         private List<State> listaDeEstados = new List<State>();
-
+        /// <summary>
+        /// Representa el tipo de máquinas que introdujeron al programa, los tipos pueden ser: Mealy, Moore.
+        /// </summary>
         public string tipo { get; set; }
+        /// <summary>
+        /// Representa la cantidad de estados de la primera máquina.
+        /// </summary>
         public int cantidadEstadosM1 = 0;
+        /// <summary>
+        /// Representa la cantidad de estados de la segunda máquina.
+        /// </summary>
         public int cantidadEstadosM2 = 0;
+        /// <summary>
+        /// Representa la cantidad de columnas para la tabla que representa la máquina.
+        /// Para máquinas mealy: número de estímulos + columna de nombres de estados
+        /// Para máquinas moore: número de estímulos + columna de nombres de estados + columna de outputs
+        /// </summary>
         public int cantidadColumnasMaquinas = 0;
-
+        /// <summary>
+        /// Representa la primera máquina de estados. Puede ser mealy o moore
+        /// </summary>
         public string[,] matrizM1 { get; set; }
+        /// <summary>
+        /// Representa la segunda máquina de estados. Puede ser mealy o moore
+        /// </summary>
         public string[,] matrizM2 { get; set; }
+        /// <summary>
+        /// Representa la matriz de suma directa de ambas máquinas de estado, necesaria para el algoritmo de particionamiento.
+        /// </summary>
         public string[,] matrizSumaDirecta { get; set; }
-
+        /// <summary>
+        /// Permite agregar un nuevo estado a la lista de estados de la máquina.
+        /// </summary>
+        /// <param name="nuevoEstado">Nuevo estado a agregar</param>
         public void agregarEstado(State nuevoEstado)
         {
             listaDeEstados.Add(nuevoEstado);
         }
+        /// <summary>
+        /// Perimite reiniciar la lista de estados para que pueda ser usada para representar la lista de estados de otra máquina
+        /// </summary>
         public void reiniciarListaEstados()
         {
             listaDeEstados = new List<State>();
         }
-        
-        public void particionar()
+        /// <summary>
+        /// Permite el llamado al método de particionamiento correcto de acuerdo con el tipo de máquinas que se esta manejando
+        /// </summary>
+        /// <returns>Retorna true si las máquinas son equivalentes, false en el caso contrario</returns>
+        public bool particionar()
         {
             if (tipo.Equals("Mealy"))
             {
-                particionamientoMealy();
+                return particionamientoMealy();
             }
-            else if (tipo.Equals("Moore"))
+            else
             {
-                particionamientoMoore();
+                return particionamientoMoore();
             }
         }
+        /// <summary>
+        /// Permite representar las relaciones de la primera máquina de estados de moore en forma de árbol con el fin de realizar un recorrido BFS
+        /// y así poder encontrar los estados inaccesibles, los cuales elimina para dejar las máquinas listas para el análisis
+        /// de equivalencia.
+        /// </summary>
         public void crearRelacionesMooreM1()
         {
             //Empieza a crearse las relaciones
-           
-                for (int a = 0; a < cantidadEstadosM1; a++)
+
+            for (int a = 0; a < cantidadEstadosM1; a++)
+            {
+                for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
                 {
-                    for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
+                    State padre = null;
+                    foreach (State elemento in listaDeEstados)
                     {
-                        State padre = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM1[a, 0] == elemento.name) padre = elemento;
-                        }
-                        State hijo = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM1[a, b] == elemento.name) hijo = elemento;
-                        }
-                        padre.setEstadoAdyacente(hijo);
+                        if (matrizM1[a, 0] == elemento.name) padre = elemento;
+                    }
+                    State hijo = null;
+                    foreach (State elemento in listaDeEstados)
+                    {
+                        if (matrizM1[a, b] == elemento.name) hijo = elemento;
+                    }
+                    padre.setEstadoAdyacente(hijo);
+                }
+            }
+
+            BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
+            List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
+            //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
+            int estadosEliminados = 0;
+
+            for (int i = 1; i < cantidadEstadosM1; i++)
+            {
+                Boolean seEncontro = false;
+                for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
+                {
+                    if (listaAlcanzables.ElementAt(j).name == matrizM1[i, 0])
+                    {
+                        seEncontro = true;
                     }
                 }
-
-                BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
-                List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
-                //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
-                int estadosEliminados = 0;
-
-                for (int i = 1; i < cantidadEstadosM1; i++)
+                if (!seEncontro)
                 {
-                    Boolean seEncontro = false;
-                    for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
-                    {
-                        if (listaAlcanzables.ElementAt(j).name == matrizM1[i, 0])
-                        {
-                            seEncontro = true;
-                        }
-                    }
-                    if (!seEncontro)
-                    {
-                        //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
-                        estadosEliminados++;
-                        matrizM1[i, 0] = "";
-                    }
+                    //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
+                    estadosEliminados++;
+                    matrizM1[i, 0] = "";
                 }
-                //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
-                cantidadEstadosM1 = cantidadEstadosM1 - estadosEliminados;
-                //Creamos la nueva matriz con estados eliminados
-                string[,] nuevaMatrizM1 = new string[cantidadEstadosM1, cantidadColumnasMaquinas];
-                //Llenamos la nueva matriz
-                for (int i = 0, l = 0; i < cantidadEstadosM1; i++, l++)
+            }
+            //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
+            cantidadEstadosM1 = cantidadEstadosM1 - estadosEliminados;
+            //Creamos la nueva matriz con estados eliminados
+            string[,] nuevaMatrizM1 = new string[cantidadEstadosM1, cantidadColumnasMaquinas];
+            //Llenamos la nueva matriz
+            for (int i = 0, l = 0; i < cantidadEstadosM1; i++, l++)
+            {
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
                 {
-                    for (int j = 0; j < cantidadColumnasMaquinas; j++)
+                    while (matrizM1[l, 0] == "")
                     {
-                        while (matrizM1[l, 0] == "")
-                        {
-                            l++;
-                        }
-                        //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
-                        nuevaMatrizM1[i, j] = matrizM1[l, j];
+                        l++;
                     }
+                    //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
+                    nuevaMatrizM1[i, j] = matrizM1[l, j];
                 }
+            }
 
-                matrizM1 = nuevaMatrizM1;
+            matrizM1 = nuevaMatrizM1;
 
-            
+
         }
+        /// <summary>
+        /// Permite representar las relaciones de la segunda máquina de estados en forma de árbol con el fin de realizar un recorrido BFS
+        /// y así poder encontrar los estados inaccesibles, los cuales elimina para dejar las máquinas listas para el análisis
+        /// de equivalencia.
+        /// </summary>
         public void crearRelacionesMooreM2()
         {
             //Empieza a crearse las relaciones
-            
-                for (int a = 0; a < cantidadEstadosM2; a++)
+
+            for (int a = 0; a < cantidadEstadosM2; a++)
+            {
+                for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
                 {
-                    for (int b = 1; b < cantidadColumnasMaquinas - 1; b++)
+                    State padre = null;
+                    foreach (State elemento in listaDeEstados)
                     {
-                        State padre = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM2[a, 0] == elemento.name) padre = elemento;
-                        }
-                        State hijo = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM2[a, b] == elemento.name) hijo = elemento;
-                        }
-                        padre.setEstadoAdyacente(hijo);
+                        if (matrizM2[a, 0] == elemento.name) padre = elemento;
+                    }
+                    State hijo = null;
+                    foreach (State elemento in listaDeEstados)
+                    {
+                        if (matrizM2[a, b] == elemento.name) hijo = elemento;
+                    }
+                    padre.setEstadoAdyacente(hijo);
+                }
+            }
+
+            BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
+            List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
+            //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
+            int estadosEliminados = 0;
+
+            for (int i = 1; i < cantidadEstadosM2; i++)
+            {
+                Boolean seEncontro = false;
+                for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
+                {
+                    if (listaAlcanzables.ElementAt(j).name == matrizM2[i, 0])
+                    {
+                        seEncontro = true;
                     }
                 }
-
-                BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
-                List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
-                //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
-                int estadosEliminados = 0;
-
-                for (int i = 1; i < cantidadEstadosM2; i++)
+                if (!seEncontro)
                 {
-                    Boolean seEncontro = false;
-                    for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
-                    {
-                        if (listaAlcanzables.ElementAt(j).name == matrizM2[i, 0])
-                        {
-                            seEncontro = true;
-                        }
-                    }
-                    if (!seEncontro)
-                    {
-                        //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
-                        estadosEliminados++;
-                        matrizM2[i, 0] = "";
-                    }
+                    //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
+                    estadosEliminados++;
+                    matrizM2[i, 0] = "";
                 }
-                //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
-                cantidadEstadosM2 = cantidadEstadosM2 - estadosEliminados;
-                //Creamos la nueva matriz con estados eliminados
-                string[,] nuevaMatrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
-                //Llenamos la nueva matriz
-                for (int i = 0, l = 0; i < cantidadEstadosM2; i++, l++)
+            }
+            //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
+            cantidadEstadosM2 = cantidadEstadosM2 - estadosEliminados;
+            //Creamos la nueva matriz con estados eliminados
+            string[,] nuevaMatrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
+            //Llenamos la nueva matriz
+            for (int i = 0, l = 0; i < cantidadEstadosM2; i++, l++)
+            {
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
                 {
-                    for (int j = 0; j < cantidadColumnasMaquinas; j++)
+                    while (matrizM2[l, 0] == "")
                     {
-                        while (matrizM2[l, 0] == "")
-                        {
-                            l++;
-                        }
-                        //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
-                        nuevaMatrizM2[i, j] = matrizM2[l, j];
+                        l++;
                     }
+                    //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
+                    nuevaMatrizM2[i, j] = matrizM2[l, j];
                 }
+            }
 
-                matrizM2 = nuevaMatrizM2;
+            matrizM2 = nuevaMatrizM2;
 
-                //Ahora haremos la sumaDirecta;
-                sumaDirectaMoore();
+            //Ahora haremos la sumaDirecta;
+            sumaDirectaMoore();
         }
+        /// <summary>
+        /// Permite representar las relaciones de la primera máquina de estados de mealy en forma de árbol con el fin de realizar un recorrido BFS
+        /// y así poder encontrar los estados inaccesibles, los cuales elimina para dejar las máquinas listas para el análisis
+        /// de equivalencia.
+        /// </summary>
         public void crearRelacionesMealyM1()
         {
-           
-                for (int a = 0; a < cantidadEstadosM1; a++)
+
+            for (int a = 0; a < cantidadEstadosM1; a++)
+            {
+                for (int b = 1; b < cantidadColumnasMaquinas; b++) //sE QUITO UN MENOS 1
                 {
-                    for (int b = 1; b < cantidadColumnasMaquinas; b++) //sE QUITO UN MENOS 1
+                    State padre = null;
+                    foreach (State elemento in listaDeEstados)
                     {
-                        State padre = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM1[a, 0] == elemento.name) padre = elemento;
-                        }
-                        State hijo = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            string[] nodoAdy = matrizM1[a, b].Split(',');
-                            if (nodoAdy[0] == elemento.name) hijo = elemento;
-                        }
-                        padre.setEstadoAdyacente(hijo);
+                        if (matrizM1[a, 0] == elemento.name) padre = elemento;
                     }
+                    State hijo = null;
+                    foreach (State elemento in listaDeEstados)
+                    {
+                        string[] nodoAdy = matrizM1[a, b].Split(',');
+                        if (nodoAdy[0] == elemento.name) hijo = elemento;
+                    }
+                    padre.setEstadoAdyacente(hijo);
                 }
+            }
 
             BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
             List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
@@ -237,71 +286,81 @@ namespace PrototipoMaquinasEquivalentes
 
             matrizM1 = nuevaMatrizM1;
         }
+        /// <summary>
+        /// Permite representar las relaciones de la segunda máquina de estados de mealy en forma de árbol con el fin de realizar un recorrido BFS
+        /// y así poder encontrar los estados inaccesibles, los cuales elimina para dejar las máquinas listas para el análisis
+        /// de equivalencia.
+        /// </summary>
         public void crearRelacionesMealyM2()
         {
             //Empieza a crearse las relaciones
-            
-                for (int a = 0; a < cantidadEstadosM2; a++)
+
+            for (int a = 0; a < cantidadEstadosM2; a++)
+            {
+                for (int b = 1; b < cantidadColumnasMaquinas; b++)
                 {
-                    for (int b = 1; b < cantidadColumnasMaquinas; b++)
+                    State padre = null;
+                    foreach (State elemento in listaDeEstados)
                     {
-                        State padre = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            if (matrizM2[a, 0] == elemento.name) padre = elemento;
-                        }
-                        State hijo = null;
-                        foreach (State elemento in listaDeEstados)
-                        {
-                            string[] nodoAdy = matrizM2[a, b].Split(',');
-                            if (nodoAdy[0] == elemento.name) hijo = elemento;
-                        }
-                        padre.setEstadoAdyacente(hijo);
+                        if (matrizM2[a, 0] == elemento.name) padre = elemento;
+                    }
+                    State hijo = null;
+                    foreach (State elemento in listaDeEstados)
+                    {
+                        string[] nodoAdy = matrizM2[a, b].Split(',');
+                        if (nodoAdy[0] == elemento.name) hijo = elemento;
+                    }
+                    padre.setEstadoAdyacente(hijo);
+                }
+            }
+
+            BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
+            List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
+            //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
+            int estadosEliminados = 0;
+
+            for (int i = 1; i < cantidadEstadosM2; i++)
+            {
+                Boolean seEncontro = false;
+                for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
+                {
+                    if (listaAlcanzables.ElementAt(j).name == matrizM2[i, 0])
+                    {
+                        seEncontro = true;
                     }
                 }
-
-                BreadthFirstAlgorithm consultarAlcanzables = new BreadthFirstAlgorithm();
-                List<State> listaAlcanzables = consultarAlcanzables.Traverse(listaDeEstados.ElementAt(0));
-                //Hasta este punto encontramos los estados alcanzables y los tenemos en una lista
-                int estadosEliminados = 0;
-
-                for (int i = 1; i < cantidadEstadosM2; i++)
+                if (!seEncontro)
                 {
-                    Boolean seEncontro = false;
-                    for (int j = 0; j < listaAlcanzables.Count && !seEncontro; j++)
-                    {
-                        if (listaAlcanzables.ElementAt(j).name == matrizM2[i, 0])
-                        {
-                            seEncontro = true;
-                        }
-                    }
-                    if (!seEncontro)
-                    {
-                        //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
-                        estadosEliminados++;
-                        matrizM2[i, 0] = "";
-                    }
+                    //Si no se encuentra el estado, se coloca vacio para posteriormente crear una nueva matriz sin ese estado
+                    estadosEliminados++;
+                    matrizM2[i, 0] = "";
                 }
-                //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
-                cantidadEstadosM2 = cantidadEstadosM2 - estadosEliminados;
-                //Creamos la nueva matriz con estados eliminados
-                string[,] nuevaMatrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
-                //Llenamos la nueva matriz
-                for (int i = 0, l = 0; i < cantidadEstadosM2; i++, l++)
+            }
+            //Vamos a asignar a la variable cantidadEstados el nuevo valor con las filas eliminadas
+            cantidadEstadosM2 = cantidadEstadosM2 - estadosEliminados;
+            //Creamos la nueva matriz con estados eliminados
+            string[,] nuevaMatrizM2 = new string[cantidadEstadosM2, cantidadColumnasMaquinas];
+            //Llenamos la nueva matriz
+            for (int i = 0, l = 0; i < cantidadEstadosM2; i++, l++)
+            {
+                for (int j = 0; j < cantidadColumnasMaquinas; j++)
                 {
-                    for (int j = 0; j < cantidadColumnasMaquinas; j++)
+                    while (matrizM2[l, 0] == "")
                     {
-                        while (matrizM2[l, 0] == "")
-                        {
-                            l++;
-                        }
-                        //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
-                        nuevaMatrizM2[i, j] = matrizM2[l, j];
+                        l++;
                     }
+                    //listaDeEstados no se modifica debido a que creo que no se utilizara en suma directa.
+                    nuevaMatrizM2[i, j] = matrizM2[l, j];
                 }
+            }
 
-                matrizM2 = nuevaMatrizM2;
+            matrizM2 = nuevaMatrizM2;
         }
+        /// <summary>
+        /// Permite generar la matriz de suma directa de las máquinas de estados de mealy, matriz necesaria para el
+        /// análisis de equivalencia
+        /// </summary>
+        /// <returns>Retorna una lista de listas que representan las filas y columnas de la nueva máquina de estados</returns>
         private List<List<string>> sumaDirectaMealy()
         {
             List<List<string>> sumaDirecta = new List<List<string>>();
@@ -325,6 +384,10 @@ namespace PrototipoMaquinasEquivalentes
             }
             return sumaDirecta;
         }
+        /// <summary>
+        /// Permite generar la matriz de suma directa de las máquinas de estados de moore, matriz necesaria para el
+        /// análisis de equivalencia
+        /// </summary>
         private void sumaDirectaMoore()
         {
             matrizSumaDirecta = new string[cantidadEstadosM1 + cantidadEstadosM2, cantidadColumnasMaquinas];
@@ -343,8 +406,14 @@ namespace PrototipoMaquinasEquivalentes
                 }
             }
         }
-        public void particionamientoMealy()
+        /// <summary>
+        /// Permite realizar el algoritmo de particionamiento sobre máquinas de mealy con el fin de verificar si hay equivalencia 
+        /// entre las máquinas.
+        /// </summary>
+        /// <returns>Retorna true si las máquinas resultan equivalentes, false en caso contrario</returns>
+        public bool particionamientoMealy()
         {
+            //INICIO PARTICIÓN 1
             List<List<string>> sumaDirecta = sumaDirectaMealy();
             List<List<string>> particiones = new List<List<string>>(); // Aquí serán guardadas las particiones
             for (int i = 0; i < sumaDirecta.Count; i++)
@@ -360,23 +429,110 @@ namespace PrototipoMaquinasEquivalentes
                     {
                         string[] transicionTemp = filaTemp[k].Split(',');
                         string[] transicionActual = sumaDirecta[j][k].Split(',');
-                        if(transicionTemp[1].Equals(transicionActual[1]))
+                        if (transicionTemp[1].Equals(transicionActual[1]))
                         {
                             outputsIguales++;
                         }
                     }
-                    if(outputsIguales == cantidadColumnasMaquinas-1)
+                    if (outputsIguales == cantidadColumnasMaquinas - 1)
                     {
-                        particion.Add(sumaDirecta[j][0]);
+                        particion.Add(sumaDirecta[j][0] + "");
                         sumaDirecta.Remove(sumaDirecta[j]);
+                        j = -1;
                     }
+                    
                 }
                 particiones.Add(particion);
-
+                i = -1;
             }
-            int f = 0;
+            //FINAL PARTICIÓN 1
+            sumaDirecta = sumaDirectaMealy();
+            List<List<string>> nuevasParticiones = new List<List<string>>();
+            Boolean diferentes = true;
+            while (diferentes)
+            {
+
+                for (int l = 0; l < particiones.Count; l++)
+                {
+                    List<string> particion = new List<string>();
+                    
+                    string[] aux = new string[particiones[l].Count];
+                    particiones[l].CopyTo(aux);
+                    particion = aux.ToList();
+                    nuevasParticiones.Add(particion);
+                    
+                    if (particion.Count > 1)
+                    {
+                        for (int k = 0; k < particion.Count; k++)
+                        {
+                            string estado = particion[k];
+                            List<string> nuevaParticion = new List<string>();
+                            for (int i = 0; i < particion.Count; i++)
+                            {
+
+                                int sucesoresEnMismaParticion = 0;
+                                List<List<string>> filaEstadoTemp = sumaDirecta.Where(x => x[0].Equals(particion[i])).ToList();
+                                List<List<string>> filaEstadoActual = sumaDirecta.Where(x => x[0].Equals(estado)).ToList();
+                                for (int j = 1; j < cantidadColumnasMaquinas; j++)
+                                {
+                                    string[] tempActual = filaEstadoActual[0][j].Split(',');
+                                    string[] tempTemp = filaEstadoTemp[0][j].Split(',');
+                                    if (particiones.Where(x => x.Contains(tempActual[0]) && x.Contains(tempTemp[0])).Count() != 0)
+                                    {
+                                        sucesoresEnMismaParticion++;
+                                    }
+                                }
+                                if (sucesoresEnMismaParticion != cantidadColumnasMaquinas - 1)
+                                {
+                                    nuevaParticion.Add(particion[i]);
+                                    particion.Remove(particion[i]);
+                                    i = -1;
+                                }
+                            }
+                            if (nuevaParticion.Count != 0)
+                            {
+                                nuevasParticiones.Add(nuevaParticion);
+                            }
+                        }
+                    }
+                }
+                if(nuevasParticiones.Count == particiones.Count)
+                {
+                    diferentes = false;
+                }
+                imprimirParticiones(particiones);
+                particiones = new List<List<string>>();
+                foreach (List<string> particion in nuevasParticiones)
+                {
+                    particiones.Add(particion);
+                };
+                nuevasParticiones = new List<List<string>>();
+            }
+            return comprobarMaquinaDeMoore(particiones);
         }
-        public void particionamientoMoore()
+        /// <summary>
+        /// Permite imprimir las particiones dadas por parámetro con el fin de verificar que el algoritmo de particionamiento 
+        /// funcione.
+        /// </summary>
+        /// <param name="particiones">Lista de listas que contiene las particiones de una máquina de suma directa</param>
+        public void imprimirParticiones(List<List<string>> particiones)
+        {
+            foreach (List<string> particion in particiones)
+            {
+                Console.Write("{");
+                foreach (string estado in particion)
+                {
+                    Console.Write(estado + ",");
+                }
+                Console.Write("}");
+            }
+        }
+        /// <summary>
+        /// Permite realizar el algoritmo de particionamiento sobre máquinas de moore con el fin de verificar si hay equivalencia 
+        /// entre las máquinas.
+        /// </summary>
+        /// <returns>Retorna true si las máquinas resultan equivalentes, false en caso contrario</returns>
+        public bool particionamientoMoore()
         {
 
             //INICIO PARTICION 1
@@ -518,11 +674,19 @@ namespace PrototipoMaquinasEquivalentes
                 }
             }
 
-            comprobarMaquinaDeMoore(lista);
+            return comprobarMaquinaDeMoore(lista);
 
 
         }
-        public void comprobarMaquinaDeMoore(List<List<string>> listaFinal)
+        /// <summary>
+        /// Permite determinar si la partición encontrada al final del algoritmo de particionamiento cumple con las
+        /// condiciones que necesita para concluir la equivalencia de las máquinas.
+        /// Condición 1: Dentro de cada partición debe existir almenos un estado de cada una de las máquinas originales.
+        /// Condición 2: Dentro de alguna de las particiones se encuentran los estados inciales de las máquinas originales.
+        /// </summary>
+        /// <param name="listaFinal">Particiones finales producto del algoritmo de particionamiento</param>
+        /// <returns></returns>
+        public bool comprobarMaquinaDeMoore(List<List<string>> listaFinal)
         {
             Boolean resultado = true;
             for (int i = 0; i < listaFinal.Count; i++)
@@ -533,6 +697,7 @@ namespace PrototipoMaquinasEquivalentes
                     break;
                 }
             }
+            
             resultado = resultado && (listaFinal.ElementAt(0).Contains(matrizM1[0, 0]) && listaFinal.ElementAt(0).Contains(matrizM2[0, 0]));
 
             if (resultado)
@@ -574,6 +739,7 @@ namespace PrototipoMaquinasEquivalentes
             }
 
             Console.WriteLine(resultado);
+            return resultado;
         }
     }
 

@@ -36,6 +36,9 @@
             this.btnRealizarAnalisis = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.cbxTipoMaquinas = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnCrearTablasEstados
@@ -46,7 +49,7 @@
             this.btnCrearTablasEstados.TabIndex = 2;
             this.btnCrearTablasEstados.Text = "3. Crear Tablas de Estado";
             this.btnCrearTablasEstados.UseVisualStyleBackColor = true;
-            this.btnCrearTablasEstados.Click += new System.EventHandler(this.agregarColumna_Click);
+            this.btnCrearTablasEstados.Click += new System.EventHandler(this.inicializarTablas_Click);
             // 
             // Columnas
             // 
@@ -113,11 +116,45 @@
             this.cbxTipoMaquinas.Size = new System.Drawing.Size(100, 24);
             this.cbxTipoMaquinas.TabIndex = 9;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(321, 72);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(869, 17);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Deben especificarse dejando un espacio entre ellos (ej: A B C...). No deben conte" +
+    "ner carácteres especiales como \"_\", \".\", \",\", \"?\", \"<\", \">\"";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(321, 30);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(711, 17);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "Para máquinas mealy las transiciones debe ser de la forma (Estado,Salida). Para m" +
+    "áquinas de moore (Estado).";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(46, 423);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(474, 17);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "¡Importante!: Verificar las tablas de estados antes de comenzar el análisis.";
+            // 
             // Vista
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1003, 514);
+            this.ClientSize = new System.Drawing.Size(1408, 519);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.cbxTipoMaquinas);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnRealizarAnalisis);
@@ -127,7 +164,8 @@
             this.Controls.Add(this.Columnas);
             this.Controls.Add(this.btnCrearTablasEstados);
             this.Name = "Vista";
-            this.Text = "Vista";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Finite States Machines Equivalency Tester";
             this.Load += new System.EventHandler(this.Vista_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -145,5 +183,8 @@
         private System.Windows.Forms.Button btnRealizarAnalisis;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbxTipoMaquinas;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
     }
 }

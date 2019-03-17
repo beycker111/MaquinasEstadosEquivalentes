@@ -12,9 +12,18 @@ namespace PrototipoMaquinasEquivalentes
 {
     public partial class Vista : Form
     {
+        /// <summary>
+        /// Representa el tester de equivalencia entre las máquinas
+        /// </summary>
         private EquivalencyTester model;
+        /// <summary>
+        /// Representa el caracter especial usado para renombrar los estados del segundo autómata dado
+        /// </summary>
         public static string _ESP = "_";
 
+        /// <summary>
+        /// Inicializa la interfaz gráfica
+        /// </summary>
         public Vista()
         {
             InitializeComponent();
@@ -24,15 +33,22 @@ namespace PrototipoMaquinasEquivalentes
         {
 
         }
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
 
+        }
         private void agregarFila_Click(object sender, EventArgs e)
         {
             dataGridView1.AllowUserToAddRows = true;
             dataGridView1.AllowUserToDeleteRows = true;
 
         }
-
-        private void agregarColumna_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Permite inicializar las tablas de las máquinas
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void inicializarTablas_Click(object sender, EventArgs e)
         {
             if (this.cbxTipoMaquinas.Text.Equals("Mealy"))
             {
@@ -53,6 +69,9 @@ namespace PrototipoMaquinasEquivalentes
         {
 
         }
+        /// <summary>
+        /// Permite inicializar las tablas para insertar los datos de las máquinas de mealy, deacuerdo al número de estimulos
+        /// </summary>
         private void initializeMealyStateTables()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -93,7 +112,8 @@ namespace PrototipoMaquinasEquivalentes
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             
             this.dataGridView1.Columns.AddRange(columnasgrid1);
-            this.dataGridView1.Location = new System.Drawing.Point(20,150);
+            this.dataGridView1.Location = new System.Drawing.Point(20, 170);
+            this.dataGridView1.Size = new Size(500, 150);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.TabIndex = 0;
@@ -108,13 +128,15 @@ namespace PrototipoMaquinasEquivalentes
             // 
             // dataGridView2
             // 
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 
             this.dataGridView2.Columns.AddRange(columnasgrid2);
-            this.dataGridView2.Location = new System.Drawing.Point(410, 150);
-            this.dataGridView2.Name = "dataGridView1";
+            this.dataGridView2.Location = new System.Drawing.Point(540, 170);
+            this.dataGridView2.Size = new Size(500, 150);
+            this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowTemplate.Height = 24;
             this.dataGridView2.TabIndex = 0;
-            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
             this.dataGridView2.AllowUserToAddRows = true;
             this.dataGridView2.AllowUserToDeleteRows = true;
             this.dataGridView2.AllowUserToOrderColumns = false;
@@ -123,6 +145,10 @@ namespace PrototipoMaquinasEquivalentes
 
         }
 
+
+        /// <summary>
+        /// Permite inicializar las tablas para insertar los datos de las máquinas de moore, deacuerdo al número de estimulos
+        /// </summary>
         private void initializeMooreStateTables()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -172,6 +198,7 @@ namespace PrototipoMaquinasEquivalentes
 
             this.dataGridView1.Columns.AddRange(columnasgrid1);
             this.dataGridView1.Location = new System.Drawing.Point(20, 170);
+            this.dataGridView1.Size = new Size(500, 150);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.TabIndex = 0;
@@ -190,7 +217,8 @@ namespace PrototipoMaquinasEquivalentes
             // 
 
             this.dataGridView2.Columns.AddRange(columnasgrid2);
-            this.dataGridView2.Location = new System.Drawing.Point(410, 170);
+            this.dataGridView2.Location = new System.Drawing.Point(540, 170);
+            this.dataGridView2.Size = new Size(500, 150);
             this.dataGridView2.Name = "dataGridView1";
             this.dataGridView2.RowTemplate.Height = 24;
             this.dataGridView2.TabIndex = 0;
@@ -207,15 +235,32 @@ namespace PrototipoMaquinasEquivalentes
         {
 
         }
-
+        /// <summary>
+        /// Permite realizar el análisis de equivalencia entre las máquinas dadas, envía un mensaje al usuario diciendo si las 
+        /// máquinas son equivalentes o no.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnRealizarAnalisis_Click(object sender, EventArgs e)
         {
             model = new EquivalencyTester();
             generateMachines();
-            model.particionar();
+            bool equivalencia = model.particionar();
+            DialogResult result;
+            if (equivalencia == true)
+            {
+                result = MessageBox.Show("Las máquinas son equivalentes", "Resultado del análisis", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                result =  MessageBox.Show("Las máquinas no son equivalentes", "Resultado del análisis", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            Application.Restart();
 
         }
-
+        /// <summary>
+        /// Permite leer los datos de las máquinas dados por medio de la interfaz gráfica para poder crear los objetos en el modelo
+        /// </summary>
         private void generateMachines()
         {
             model.tipo = cbxTipoMaquinas.Text;
@@ -287,6 +332,16 @@ namespace PrototipoMaquinasEquivalentes
                 model.matrizM2 = M2;
                 model.crearRelacionesMealyM2();
             }
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
 
         }
     }
