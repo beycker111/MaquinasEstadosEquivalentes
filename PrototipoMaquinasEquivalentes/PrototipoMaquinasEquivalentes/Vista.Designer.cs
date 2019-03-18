@@ -74,9 +74,10 @@
             this.lblEspecificarTransiciones.AutoSize = true;
             this.lblEspecificarTransiciones.Location = new System.Drawing.Point(43, 161);
             this.lblEspecificarTransiciones.Name = "lblEspecificarTransiciones";
-            this.lblEspecificarTransiciones.Size = new System.Drawing.Size(331, 17);
+            this.lblEspecificarTransiciones.Size = new System.Drawing.Size(965, 17);
             this.lblEspecificarTransiciones.TabIndex = 5;
-            this.lblEspecificarTransiciones.Text = "4. Especificar transiciones en las tablas de estados";
+            this.lblEspecificarTransiciones.Text = "4. Especificar transiciones en las tablas de estados. Los nombres de los estados " +
+    "no deben contener carácteres especiales como \"_\", \".\", \",\", \"?\", \"<\", \">\"";
             // 
             // label2
             // 
@@ -121,10 +122,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(321, 72);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(869, 17);
+            this.label3.Size = new System.Drawing.Size(419, 17);
             this.label3.TabIndex = 10;
-            this.label3.Text = "Deben especificarse dejando un espacio entre ellos (ej: A B C...). No deben conte" +
-    "ner carácteres especiales como \"_\", \".\", \",\", \"?\", \"<\", \">\"";
+            this.label3.Text = "Deben especificarse dejando un espacio entre ellos (ej: A B C...).";
             this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // label4
@@ -151,7 +151,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1412, 519);
+            this.ClientSize = new System.Drawing.Size(1409, 519);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
